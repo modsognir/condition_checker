@@ -1,6 +1,6 @@
-# ConditionChecker
+# ConditionChecker !! WIP !!
 
-ConditionChecker is a Ruby gem that provides a flexible way to define and check conditions on objects.
+ConditionChecker is a gem that provides a way to define and check conditions on objects.
 
 ## Installation
 
@@ -41,10 +41,15 @@ class WebsiteHealth
   condition "memory.optimal", MemoryChecker  # calls MemoryChecker.call(website)
   condition "response_time.acceptable", ResponseTimeChecker
 
+  # Conditions can also just be a method
+  def everything_ok
+    true
+  end
+
   # Group conditions into meaningful checks
   check :critical_services, conditions: ["database.connected", "api.healthy"]
   check "performance.ok", conditions: ["memory.optimal", "response_time.acceptable"]
-  check :all_systems_go, conditions: ["database.connected", "api.healthy", "memory.optimal", "response_time.acceptable"]
+  check :all_systems_go, conditions: ["database.connected", "api.healthy", "memory.optimal", "response_time.acceptable", "everything_ok"]
 end
 ```
 
@@ -62,7 +67,7 @@ else
 end
 
 # Get specific check results
-critical_check = checker.checks.find { |check| check.name == "critical_services" }
+critical_services = checker["critical_services"] # or checker.check("critical_services")
 if critical_check.success?
   puts "Critical services are up!"
 else
@@ -70,9 +75,10 @@ else
 end
 
 # Get all failing conditions
-failing_conditions = checker.fails.flat_map(&:fails)
-failing_conditions.each do |condition|
-  puts "Failed: #{condition.name}"
+checker.fails.map do |check|
+  check.conditions.map do |condition|
+    [condition.name, condition.value, condition.result.value] # ["database.connected", true, true]
+  end
 end
 
 # Example
@@ -81,10 +87,10 @@ class SystemMonitor
     checker = WebsiteHealth.for(website)
     
     {
-      status: checker.fails.empty? ? :healthy : :unhealthy,
+      status: checker.fail? ? :unhealthy : :healthy,
       total_checks: checker.checks.size,
       failing_checks: checker.fails.size,
-      critical_services: checker.checks.find { |c| c.name == "critical_services" }.success?,
+      critical_services: checker.checks.find("critical_services").success?,
       failures: checker.fails.map { |check|
         {
           check: check.name,
@@ -99,7 +105,7 @@ end
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests.
+After checking out the repo, run `bundle install` to install dependencies. Then, run `rspec` to run the tests.
 
 ## Contributing
 

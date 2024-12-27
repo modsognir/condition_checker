@@ -9,15 +9,25 @@ module ConditionChecker
     end
 
     def call(object)
-      @result = Result.new(name: name, result: conditional.call(object))
+      @result = Result.new(name: name, value: call_conditional(object))
     end
 
     def success?
-      !!@result&.result
+      !!value
     end
 
     def fail?
-      !@result&.result
+      !value
+    end
+
+    def value
+      @result&.value
+    end
+
+    def call_conditional(object)
+      return conditional.call(object) if conditional.is_a?(Class)
+
+      conditional.arity == 1 ? conditional.call(object) : conditional.call
     end
 
     def to_s

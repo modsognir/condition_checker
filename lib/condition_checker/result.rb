@@ -1,22 +1,22 @@
 module ConditionChecker
   class Result
-    attr_reader :name, :conditional, :result
+    attr_reader :name, :conditional, :value
 
-    def initialize(name:, result:)
+    def initialize(name:, value:)
       @name = name.to_s
-      @result = result
+      @value = value
     end
 
     def success?
-      !!@result
+      !!@value
     end
 
     def fail?
-      @result == false
+      @value == false
     end
 
     def ==(other)
-      name == other.name && result == other.result
+      name == other.name && value == other.value
     end
   end
 end

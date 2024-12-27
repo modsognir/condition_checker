@@ -1,16 +1,14 @@
 module ConditionChecker
   class Runner
-    attr_reader :object, :conditions
+    attr_reader :object
 
     def initialize(object, conditions, checks)
       @object = object
-      @conditions = conditions
       @checks = checks
       @run = false
     end
 
     def run
-      conditions.each { |condition| condition.call(object) }
       @checks.each { |check| check.call(object) }
       @run = true
       @checks
@@ -28,5 +26,18 @@ module ConditionChecker
     def fails
       checks.select(&:fail?)
     end
+
+    def success?
+      successes.all?
+    end
+
+    def fail?
+      fails.any?
+    end
+
+    def [](name)
+      checks.find { |check| check.name.to_s == name.to_s }
+    end
+    alias find []
   end
 end

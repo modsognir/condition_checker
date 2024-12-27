@@ -34,16 +34,20 @@ RSpec.describe ConditionChecker do
   end
 
   class WebsiteHealth
-    extend ConditionChecker::Mixin
+    include ConditionChecker::Mixin
 
     condition "database.connected", ->(website) { website.database_connected? }
     condition "api.healthy", ->(website) { website.api_healthy? }
     condition "memory.optimal", MemoryChecker
     condition "response_time.acceptable", ResponseTimeChecker
 
+    def everything_ok
+      true
+    end
+
     check :critical_services, conditions: ["database.connected", "api.healthy"]
     check "performance.ok", conditions: ["memory.optimal", "response_time.acceptable"]
-    check :all_systems_go, conditions: ["database.connected", "api.healthy", "memory.optimal", "response_time.acceptable"]
+    check :all_systems_go, conditions: ["database.connected", "api.healthy", "memory.optimal", "response_time.acceptable", "everything_ok"]
   end
 
   let(:website) { TestWebsite.new }
@@ -53,8 +57,9 @@ RSpec.describe ConditionChecker do
     results = runner.checks
     expect(results.size).to eq(3)
     expect(results.map(&:success?)).to eql([true, true, true])
-    all_systems = results.find { |check| check.name == "all_systems_go" }
+    all_systems = runner.find("all_systems_go")
     expect(all_systems).to be_success
+    expect(all_systems.map { [_1.name, 1.value] }).to eql([])
   end
 
   context "with database issues" do

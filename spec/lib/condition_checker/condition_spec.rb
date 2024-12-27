@@ -17,7 +17,7 @@ RSpec.describe ConditionChecker::Condition do
     end
 
     it 'initializes with a nil result' do
-      expect(condition.result).to be_nil
+      expect(condition.value).to be_nil
     end
   end
 
@@ -29,15 +29,15 @@ RSpec.describe ConditionChecker::Condition do
 
     it 'sets the result internally' do
       condition.call('test')
-      expect(condition.result).to be_a(ConditionChecker::Result)
+      expect(condition.value).to be_a(ConditionChecker::Result)
     end
 
     it 'evaluates the conditional with the given object' do
       result = condition.call('test')
-      expect(result.result).to be true
+      expect(result.value).to be true
 
       result = condition.call(123)
-      expect(result.result).to be false
+      expect(result.value).to be false
     end
 
     it 'includes the condition name in the result' do

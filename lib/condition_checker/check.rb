@@ -13,11 +13,11 @@ module ConditionChecker
     end
 
     def successes
-      Array(@result).select(&:result)
+      Array(@result).select(&:success?)
     end
 
     def fails
-      Array(@result).reject(&:result)
+      Array(@result).reject(&:success?)
     end
 
     def success?
