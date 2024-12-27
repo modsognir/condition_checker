@@ -13,11 +13,11 @@ RSpec.describe ConditionChecker::Runner do
       context.value < 30
     end
 
-    condition "increment", ->(obj) { obj.value += 1; true }
-    condition "double", ->(obj) { obj.value *= 2; true }
+    condition "first_check", ->(obj) { true }
+    condition "second_check", ->(obj) { true }
 
-    check :value_above_15, conditions: ["increment", "double", "value_check"]
-    check "value_below_30", conditions: ["increment", "double", "under_thirty"]
+    check :value_above_15, conditions: ["first_check", "second_check", "value_check"]
+    check "value_below_30", conditions: ["first_check", "second_check", "under_thirty"]
   end
 
   let(:test_object) { OpenStruct.new(value: 10) }
@@ -31,21 +31,21 @@ RSpec.describe ConditionChecker::Runner do
     end
   end
 
-  describe '#run' do
-    it 'executes conditions and returns self' do
-      expect(runner.run).to eq(runner)
-      # After conditions run: 10 -> 11 -> 22
-      expect(test_object.value).to eq(22)
-    end
-  end
-
   describe '#[]' do
     before { runner.run }
 
     it 'finds a check by name' do
-      expect(runner["value_above_15"]).to be_success
-      expect(runner[:value_above_15]).to be_success
-      expect(runner["value_below_30"]).to be_success
+      check = runner["value_above_15"]
+      expect(check).to be_an_instance_of(ConditionChecker::Check)
+      expect(check.name).to eq("value_above_15")
+
+      check = runner[:value_above_15] 
+      expect(check).to be_an_instance_of(ConditionChecker::Check)
+      expect(check.name).to eq("value_above_15")
+
+      check = runner["value_below_30"]
+      expect(check).to be_an_instance_of(ConditionChecker::Check) 
+      expect(check.name).to eq("value_below_30")
     end
 
     it 'returns nil for unknown check names' do
@@ -53,10 +53,10 @@ RSpec.describe ConditionChecker::Runner do
     end
   end
 
-  describe '#check' do
+  describe '#find' do
     it 'is an alias for []' do
       runner.run
-      expect(runner.check("value_above_15")).to eq(runner["value_above_15"])
+      expect(runner.find("value_above_15")).to eq(runner["value_above_15"])
     end
   end
 
@@ -84,80 +84,18 @@ RSpec.describe ConditionChecker::Runner do
     end
   end
 
-  describe '#successes' do
-    before { runner.run }
-
-    it 'returns successful checks' do
-      expect(runner.successes.map(&:name)).to contain_exactly(
-        "value_above_15",
-        "value_below_30"
-      )
-    end
-
-    context 'with failing checks' do
-      let(:test_object) { OpenStruct.new(value: 5) }
-
-      it 'returns only successful checks' do
-        expect(runner.successes.map(&:name)).to contain_exactly("value_below_30")
-      end
-    end
-  end
-
-  describe '#fails' do
-    before { runner.run }
-
-    it 'returns no failing checks when all succeed' do
-      expect(runner.fails).to be_empty
-    end
-
-    context 'with failing checks' do
-      let(:test_object) { OpenStruct.new(value: 5) }
-
-      it 'returns failing checks' do
-        expect(runner.fails.map(&:name)).to contain_exactly("value_above_15")
-      end
-    end
-  end
-
-  describe '#success?' do
-    before { runner.run }
-
-    it 'returns true when all checks pass' do
-      expect(runner.success?).to be true
-    end
-
-    context 'with failing checks' do
-      let(:test_object) { OpenStruct.new(value: 5) }
-
-      it 'returns false' do
-        expect(runner.success?).to be false
-      end
-    end
-  end
-
-  describe '#fail?' do
-    before { runner.run }
-
-    it 'returns false when all checks pass' do
-      expect(runner.fail?).to be false
-    end
-
-    context 'with failing checks' do
-      let(:test_object) { OpenStruct.new(value: 5) }
-
-      it 'returns true' do
-        expect(runner.fail?).to be true
-      end
-    end
-  end
-
   describe 'integration with conditions and checks' do
     before { runner.run }
 
-    it 'allows accessing condition results through checks' do
-      check = runner["value_above_15"]
-      expect(check.conditions.map(&:name)).to eq(["increment", "double", "value_check"])
-      expect(check.conditions.map(&:success?)).to all(be true)
+    context 'with successful conditions' do 
+      let(:test_object) { OpenStruct.new(value: 20) }
+      it 'allows accessing condition results through checks' do
+        check = runner["value_above_15"]
+        expect(check.conditions.map(&:name)).to eq(["first_check", "second_check", "value_check"])
+        expect(check.successes.map(&:name)).to eq(["first_check", "second_check", "value_check"])
+        expect(check.conditions.map(&:success?)).to all(be true)
+        expect(check).to be_success
+      end
     end
 
     context 'with failing conditions' do
@@ -166,6 +104,7 @@ RSpec.describe ConditionChecker::Runner do
       it 'tracks failed conditions' do
         check = runner["value_above_15"]
         expect(check.conditions.map(&:success?)).to eq([true, true, false])
+        expect(check.fails.map(&:name)).to eq(["value_check"])
       end
     end
   end

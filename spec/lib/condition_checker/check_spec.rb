@@ -7,7 +7,7 @@ RSpec.describe ConditionChecker::Check do
     end
 
     def call(object)
-      OpenStruct.new(result: @result)
+      ConditionChecker::Result.new(name: "test_check", value: @result)
     end
   end
 
@@ -37,15 +37,15 @@ RSpec.describe ConditionChecker::Check do
     it 'returns an array of results' do
       results = check.call(test_object)
       expect(results.size).to eq(2)
-      expect(results.first.result).to be true
-      expect(results.last.result).to be false
+      expect(results.first.value).to be true
+      expect(results.last.value).to be false
     end
 
     it 'stores the results' do
       check.call(test_object)
       expect(check.result.size).to eq(2)
-      expect(check.result.first.result).to be true
-      expect(check.result.last.result).to be false
+      expect(check.result.first.value).to be true
+      expect(check.result.last.value).to be false
     end
   end
 
@@ -55,7 +55,7 @@ RSpec.describe ConditionChecker::Check do
     it 'returns successful results' do
       check.call(test_object)
       expect(check.successes.size).to eq(1)
-      expect(check.successes.first.result).to be true
+      expect(check.successes.first.value).to be true
     end
   end
 
@@ -65,7 +65,7 @@ RSpec.describe ConditionChecker::Check do
     it 'returns failed results' do
       check.call(test_object)
       expect(check.fails.size).to eq(1)
-      expect(check.fails.first.result).to be false
+      expect(check.fails.first.value).to be false
     end
   end
 
@@ -84,7 +84,7 @@ RSpec.describe ConditionChecker::Check do
       let(:check) { described_class.new(name, [passing_condition, failing_condition]) }
 
       it 'returns false' do
-        expect(check).to be_fail
+        expect(check).to_not be_success
       end
     end
   end
@@ -95,7 +95,7 @@ RSpec.describe ConditionChecker::Check do
       let(:check) { described_class.new(name, [passing_condition, passing_condition]) }
 
       it 'returns false' do
-        expect(check).to be_success
+        expect(check).to_not be_fail
       end
     end
 

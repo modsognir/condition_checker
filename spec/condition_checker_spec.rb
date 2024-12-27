@@ -59,7 +59,8 @@ RSpec.describe ConditionChecker do
     expect(results.map(&:success?)).to eql([true, true, true])
     all_systems = runner.find("all_systems_go")
     expect(all_systems).to be_success
-    expect(all_systems.map { [_1.name, 1.value] }).to eql([])
+    expect(all_systems.conditions.map { [_1.name, _1.value] })
+      .to eql([["database.connected", true], ["api.healthy", true], ["memory.optimal", true], ["response_time.acceptable", true], ["everything_ok", true]])
   end
 
   context "with database issues" do

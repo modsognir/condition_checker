@@ -29,7 +29,7 @@ RSpec.describe ConditionChecker::Condition do
 
     it 'sets the result internally' do
       condition.call('test')
-      expect(condition.value).to be_a(ConditionChecker::Result)
+      expect(condition.result).to be_a(ConditionChecker::Result)
     end
 
     it 'evaluates the conditional with the given object' do
