@@ -32,8 +32,8 @@ module ConditionChecker
         checks[name.to_s] = Check.new(name, check_conditions)
       end
 
-      def for(object)
-        ConditionChecker::Runner.new(object, conditions.values, checks.values)
+      def for(context)
+        ConditionChecker::Runner.new(context, conditions.values, checks.values)
       end
     end
   end

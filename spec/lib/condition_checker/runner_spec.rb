@@ -13,21 +13,21 @@ RSpec.describe ConditionChecker::Runner do
       context.value < 30
     end
 
-    condition "first_check", ->(obj) { true }
-    condition "second_check", ->(obj) { true }
+    condition "first_check", ->(cont) { true }
+    condition "second_check", ->(cont) { true }
 
     check :value_above_15, conditions: ["first_check", "second_check", "value_check"]
     check "value_below_30", conditions: ["first_check", "second_check", "under_thirty"]
   end
 
-  let(:test_object) { OpenStruct.new(value: 10) }
+  let(:test_context) { OpenStruct.new(value: 10) }
   let(:test_health) { TestHealth }
   
-  subject(:runner) { test_health.for(test_object) }
+  subject(:runner) { test_health.for(test_context) }
 
   describe '#initialize' do
-    it 'sets up the runner with the test object' do
-      expect(runner.object).to eq(test_object)
+    it 'sets up the runner with the test context' do
+      expect(runner.context).to eq(test_context)
     end
   end
 
@@ -88,7 +88,7 @@ RSpec.describe ConditionChecker::Runner do
     before { runner.run }
 
     context 'with successful conditions' do 
-      let(:test_object) { OpenStruct.new(value: 20) }
+      let(:test_context) { OpenStruct.new(value: 20) }
       it 'allows accessing condition results through checks' do
         check = runner["value_above_15"]
         expect(check.conditions.map(&:name)).to eq(["first_check", "second_check", "value_check"])
@@ -99,7 +99,7 @@ RSpec.describe ConditionChecker::Runner do
     end
 
     context 'with failing conditions' do
-      let(:test_object) { OpenStruct.new(value: 5) }
+      let(:test_context) { OpenStruct.new(value: 5) }
 
       it 'tracks failed conditions' do
         check = runner["value_above_15"]

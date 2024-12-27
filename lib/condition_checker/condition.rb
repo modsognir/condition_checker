@@ -8,8 +8,8 @@ module ConditionChecker
       @result = nil
     end
 
-    def call(object)
-      @result = Result.new(name: name, value: call_conditional(object))
+    def call(context)
+      @result = Result.new(name: name, value: call_conditional(context))
     end
 
     def success?
@@ -24,10 +24,10 @@ module ConditionChecker
       @result&.value
     end
 
-    def call_conditional(object)
-      return conditional.call(object) if conditional.is_a?(Class)
+    def call_conditional(context)
+      return conditional.call(context) if conditional.is_a?(Class)
 
-      conditional.arity == 1 ? conditional.call(object) : conditional.call
+      conditional.arity == 1 ? conditional.call(context) : conditional.call
     end
 
     def to_s

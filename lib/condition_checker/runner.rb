@@ -1,15 +1,15 @@
 module ConditionChecker
   class Runner
-    attr_reader :object
+    attr_reader :context
 
-    def initialize(object, conditions, checks)
-      @object = object
+    def initialize(context, conditions, checks)
+      @context = context
       @checks = checks
       @run = false
     end
 
     def run
-      @checks.each { |check| check.call(object) }
+      @checks.each { |check| check.call(context) }
       @run = true
       @checks
     end

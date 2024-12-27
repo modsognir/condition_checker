@@ -43,7 +43,7 @@ class WebsiteHealth
 
   # Conditions can also just be a method
   def everything_ok
-    true
+    context.everything_ok?
   end
 
   # Group conditions into meaningful checks
@@ -57,7 +57,9 @@ end
 
 ```ruby
 # Create a checker instance for your object
-checker = WebsiteHealth.for(website)
+checker = WebsiteHealth.for(website) 
+
+checker.context # passed in object can be accessed as `context` in methods
 
 # Check if everything passed
 if checker.fails.empty?

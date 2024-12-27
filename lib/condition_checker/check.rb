@@ -8,8 +8,8 @@ module ConditionChecker
       @result = nil
     end
 
-    def call(object)
-      @result = conditions.map { |condition| condition.call(object) }
+    def call(context)
+      @result = conditions.map { |condition| condition.call(context) }
     end
 
     def successes

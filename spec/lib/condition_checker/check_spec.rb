@@ -6,13 +6,13 @@ RSpec.describe ConditionChecker::Check do
       @result = result
     end
 
-    def call(object)
+    def call(context)
       ConditionChecker::Result.new(name: "test_check", value: @result)
     end
   end
 
   let(:name) { "test_check" }
-  let(:test_object) { "test" } 
+  let(:test_context) { "test" } 
   let(:passing_condition) { TestCondition.new(true) }
   let(:failing_condition) { TestCondition.new(false) }
   
@@ -35,14 +35,14 @@ RSpec.describe ConditionChecker::Check do
     let(:check) { described_class.new(name, [passing_condition, failing_condition]) }
 
     it 'returns an array of results' do
-      results = check.call(test_object)
+      results = check.call(test_context)
       expect(results.size).to eq(2)
       expect(results.first.value).to be true
       expect(results.last.value).to be false
     end
 
     it 'stores the results' do
-      check.call(test_object)
+      check.call(test_context)
       expect(check.result.size).to eq(2)
       expect(check.result.first.value).to be true
       expect(check.result.last.value).to be false
@@ -53,7 +53,7 @@ RSpec.describe ConditionChecker::Check do
     let(:check) { described_class.new(name, [passing_condition, failing_condition]) }
 
     it 'returns successful results' do
-      check.call(test_object)
+      check.call(test_context)
       expect(check.successes.size).to eq(1)
       expect(check.successes.first.value).to be true
     end
@@ -63,14 +63,14 @@ RSpec.describe ConditionChecker::Check do
     let(:check) { described_class.new(name, [passing_condition, failing_condition]) }
 
     it 'returns failed results' do
-      check.call(test_object)
+      check.call(test_context)
       expect(check.fails.size).to eq(1)
       expect(check.fails.first.value).to be false
     end
   end
 
   describe '#success?' do
-    before { check.call(test_object) }
+    before { check.call(test_context) }
 
     context 'when all conditions pass' do
       let(:check) { described_class.new(name, [passing_condition, passing_condition]) }
@@ -90,7 +90,7 @@ RSpec.describe ConditionChecker::Check do
   end
 
   describe '#fail?' do
-    before { check.call(test_object) }
+    before { check.call(test_context) }
     context 'when all conditions pass' do
       let(:check) { described_class.new(name, [passing_condition, passing_condition]) }
 
