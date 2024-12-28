@@ -1,6 +1,9 @@
 # ConditionChecker !! WIP !!
 
-ConditionChecker is a gem that provides a way to define and check conditions on objects.
+ConditionChecker is a gem that provides a way to compose and run conditionals and inspect failures.
+
+Say you have a simple page that checks your web app's health by checking a few metrics. Some checks are more complex and require checking a few things, but when they fail you want to know exactly what part failed. Some checks are less important, so you want to show them in a different way, even if they might contain some conditions of a more critical check. Or you want to show these checks in a human-readable way, labelling them or integrating with I18n.
+
 
 ## Installation
 
