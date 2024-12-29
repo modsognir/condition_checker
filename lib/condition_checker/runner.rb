@@ -9,9 +9,9 @@ module ConditionChecker
     end
 
     def run
-      @checks.each { |check| check.call(context) }
       @run = true
-      @checks
+      @checks = @checks.map { |check| check.call(context) }
+      self
     end
 
     def checks
@@ -28,7 +28,7 @@ module ConditionChecker
     end
 
     def success?
-      successes.all?
+      successes.size == checks.size
     end
 
     def fail?

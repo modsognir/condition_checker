@@ -13,19 +13,19 @@ module ConditionChecker
     end
 
     def successes
-      Array(@result).select(&:success?)
+      @result.select(&:success?)
     end
 
     def fails
-      Array(@result).reject(&:success?)
+      @result.select(&:fail?)
     end
 
     def success?
-      successes.size == conditions.size
+      @result.all?(&:success?)
     end
 
     def fail?
-      fails.size > 0
+      @result.any?(&:fail?)
     end
 
     def to_s
