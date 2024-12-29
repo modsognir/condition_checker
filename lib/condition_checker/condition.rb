@@ -10,6 +10,8 @@ module ConditionChecker
 
     def call(context)
       @result = Result.new(name: name, value: call_conditional(context))
+    rescue => e
+      @result = Result.new(name: name, value: false, error: e)
     end
 
     def success?

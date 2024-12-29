@@ -1,10 +1,11 @@
 module ConditionChecker
   class Result
-    attr_reader :name, :conditional, :value
+    attr_reader :name, :value, :error
 
-    def initialize(name:, value:)
+    def initialize(name:, value:, error: nil)
       @name = name.to_s
       @value = value
+      @error = error
     end
 
     def success?

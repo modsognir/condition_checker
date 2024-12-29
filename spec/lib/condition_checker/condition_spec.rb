@@ -44,6 +44,26 @@ RSpec.describe ConditionChecker::Condition do
       result = condition.call('test')
       expect(result.name).to eq('is_valid')
     end
+
+    context 'when the conditional raises an error' do
+      let(:error_conditional) { ->(obj) { raise StandardError, 'test error' } }
+      let(:condition) { described_class.new(name, error_conditional) }
+
+      it 'returns a Result with false value and captures the error' do
+        result = condition.call('test')
+        expect(result).to be_a(ConditionChecker::Result)
+        expect(result.value).to be false
+        expect(result.error).to be_a(StandardError)
+        expect(result.error.message).to eq('test error')
+      end
+
+      it 'sets the internal result with the error' do
+        condition.call('test')
+        expect(condition.result.value).to be false
+        expect(condition.result.error).to be_a(StandardError)
+        expect(condition.result.error.message).to eq('test error')
+      end
+    end
   end
 
   describe '#success?' do
