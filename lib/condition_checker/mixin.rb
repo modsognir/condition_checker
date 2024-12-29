@@ -27,7 +27,7 @@ module ConditionChecker
 
       def check(name, conditions:)
         check_conditions = conditions.map { |condition_name|
-          @conditions[condition_name.to_s] ||= MethodCondition.new(condition_name, self)
+          @conditions[condition_name.to_s] ? @conditions[condition_name.to_s].dup : MethodCondition.new(condition_name, self)
         }
         checks[name.to_s] = Check.new(name, check_conditions)
       end
