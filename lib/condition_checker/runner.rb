@@ -10,7 +10,7 @@ module ConditionChecker
 
     def run
       @run = true
-      @checks = @checks.map { |check| check.call(context) }
+      @checks.each { |check| check.call(context) }
       self
     end
 
