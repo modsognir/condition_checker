@@ -1,7 +1,7 @@
-require 'condition_checker/condition'
-require 'condition_checker/check'
-require 'condition_checker/runner'
-require 'condition_checker/method_condition'
+require "condition_checker/condition"
+require "condition_checker/check"
+require "condition_checker/runner"
+require "condition_checker/method_condition"
 
 module ConditionChecker
   module Mixin

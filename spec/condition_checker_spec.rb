@@ -1,55 +1,55 @@
 require "spec_helper"
 require "condition_checker"
 
+class TestWebsite
+  attr_accessor :database_connection, :api_status, :memory_usage, :response_time
+
+  def initialize(database_connection: true, api_status: :ok, memory_usage: 500, response_time: 200)
+    @database_connection = database_connection
+    @api_status = api_status
+    @memory_usage = memory_usage
+    @response_time = response_time
+  end
+
+  def database_connected?
+    @database_connection
+  end
+
+  def api_healthy?
+    @api_status == :ok
+  end
+end
+
+class MemoryChecker
+  def self.call(website)
+    website.memory_usage < 1000
+  end
+end
+
+class ResponseTimeChecker
+  def self.call(website)
+    website.response_time < 300
+  end
+end
+
+class WebsiteHealth
+  include ConditionChecker::Mixin
+
+  condition "database.connected", ->(website) { website.database_connected? }
+  condition "api.healthy", ->(website) { website.api_healthy? }
+  condition "memory.optimal", MemoryChecker
+  condition "response_time.acceptable", ResponseTimeChecker
+
+  def everything_ok
+    true
+  end
+
+  check :critical_services, conditions: ["database.connected", "api.healthy"]
+  check "performance.ok", conditions: ["memory.optimal", "response_time.acceptable"]
+  check :all_systems_go, conditions: ["database.connected", "api.healthy", "memory.optimal", "response_time.acceptable", "everything_ok"]
+end
+
 RSpec.describe ConditionChecker do
-  class TestWebsite
-    attr_accessor :database_connection, :api_status, :memory_usage, :response_time
-
-    def initialize(database_connection: true, api_status: :ok, memory_usage: 500, response_time: 200)
-      @database_connection = database_connection
-      @api_status = api_status
-      @memory_usage = memory_usage
-      @response_time = response_time
-    end
-
-    def database_connected?
-      @database_connection
-    end
-
-    def api_healthy?
-      @api_status == :ok
-    end
-  end
-
-  class MemoryChecker
-    def self.call(website)
-      website.memory_usage < 1000
-    end
-  end
-
-  class ResponseTimeChecker
-    def self.call(website)
-      website.response_time < 300
-    end
-  end
-
-  class WebsiteHealth
-    include ConditionChecker::Mixin
-
-    condition "database.connected", ->(website) { website.database_connected? }
-    condition "api.healthy", ->(website) { website.api_healthy? }
-    condition "memory.optimal", MemoryChecker
-    condition "response_time.acceptable", ResponseTimeChecker
-
-    def everything_ok
-      true
-    end
-
-    check :critical_services, conditions: ["database.connected", "api.healthy"]
-    check "performance.ok", conditions: ["memory.optimal", "response_time.acceptable"]
-    check :all_systems_go, conditions: ["database.connected", "api.healthy", "memory.optimal", "response_time.acceptable", "everything_ok"]
-  end
-
   let(:website) { TestWebsite.new }
 
   it "checks conditions correctly" do

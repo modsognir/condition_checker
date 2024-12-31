@@ -10,7 +10,7 @@ module ConditionChecker
 
     def call_conditional(context)
       host.context = context
-      host.method(name).arity == 1 ? host.public_send(name, context) : host.public_send(name)
+      (host.method(name).arity == 1) ? host.public_send(name, context) : host.public_send(name)
     end
   end
 end

@@ -38,6 +38,6 @@ module ConditionChecker
     def [](name)
       checks.find { |check| check.name.to_s == name.to_s }
     end
-    alias find []
+    alias_method :find, :[]
   end
 end

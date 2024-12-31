@@ -29,7 +29,7 @@ module ConditionChecker
     def call_conditional(context)
       return conditional.call(context) if conditional.is_a?(Class)
 
-      conditional.arity == 1 ? conditional.call(context) : conditional.call
+      (conditional.arity == 1) ? conditional.call(context) : conditional.call
     end
 
     def to_s
